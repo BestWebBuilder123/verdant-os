@@ -1,24 +1,23 @@
 {
-  "apps": [
-    {"id":"files","file":"files.html"},
-    {"id":"browser","file":"browser.html"},
-    {"id":"gamehub","file":"gamehub.html"},
-    {"id":"notes","file":"notes.html"},
-    {"id":"editor","file":"editor.html"},
-    {"id":"paint","file":"paint.html"},
-    {"id":"todo","file":"todo.html"},
-    {"id":"stopwatch","file":"stopwatch.html"},
-    {"id":"terminal","file":"terminal.html"},
-    {"id":"calculator","file":"calculator.html"},
-    {"id":"calendar","file":"calendar.html"},
-    {"id":"images","file":"images.html"},
-    {"id":"music","file":"music.html"},
-    {"id":"reader","file":"reader.html"},
-    {"id":"tasks","file":"tasks.html"},
-    {"id":"store","file":"store.html"},
-    {"id":"scientific","file":"scientific.html"},
-    {"id":"mail","file":"mail.html"},
-    {"id":"settings","file":"settings.html"},
-    {"id":"system","file":"system.html"}
-  ]
+  {
+"apps": [
+{"id":"files","file":"files.html"},
+{"id":"browser","file":"browser.html"},
+{"id":"gamehub","file":"gamehub.html"},
+{"id":"notes","file":"notes.html"},
+{"id":"editor","file":"editor.html"},
+{"id":"paint","file":"paint.html"},
+{"id":"stopwatch","file":"stopwatch.html"},
+{"id":"calculator","file":"calculator.html"},
+{"id":"calendar","file":"calendar.html"},
+{"id":"images","file":"images.html"},
+{"id":"music","file":"music.html"},
+{"id":"reader","file":"reader.html"},
+{"id":"store","file":"store.html"},
+{"id":"scientific","file":"scientific.html"},
+{"id":"mail","file":"mail.html"},
+{"id":"settings","file":"settings.html"},
+{"id":"system","file":"system.html"}
+]
+}
 }
