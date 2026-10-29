@@ -1,0 +1,147 @@
+{
+  "name": "Verdant OS Apps",
+  "version": 1,
+  "description": "Standalone HTML apps loaded by Verdant OS inside sandboxed iframes.",
+  "apps": [
+    {
+      "id": "files",
+      "name": "File Manager",
+      "icon": "▤",
+      "description": "Your local workspace",
+      "file": "files.html"
+    },
+    {
+      "id": "browser",
+      "name": "Browser",
+      "icon": "◉",
+      "description": "Open a website in a new tab",
+      "file": "browser.html"
+    },
+    {
+      "id": "gamehub",
+      "name": "Game Hub",
+      "icon": "🎮",
+      "description": "Small games, no installs",
+      "file": "gamehub.html"
+    },
+    {
+      "id": "notes",
+      "name": "Notes",
+      "icon": "▧",
+      "description": "Quick notes saved locally",
+      "file": "notes.html"
+    },
+    {
+      "id": "editor",
+      "name": "Text Editor",
+      "icon": "✎",
+      "description": "Write and keep text",
+      "file": "editor.html"
+    },
+    {
+      "id": "paint",
+      "name": "Paint Studio",
+      "icon": "❧",
+      "description": "Draw with touch or mouse",
+      "file": "paint.html"
+    },
+    {
+      "id": "todo",
+      "name": "To-Do List",
+      "icon": "☑",
+      "description": "Organize your tasks",
+      "file": "todo.html"
+    },
+    {
+      "id": "stopwatch",
+      "name": "Stopwatch",
+      "icon": "◷",
+      "description": "Time a focus session",
+      "file": "stopwatch.html"
+    },
+    {
+      "id": "terminal",
+      "name": "Terminal",
+      "icon": ">_",
+      "description": "Try built-in commands",
+      "file": "terminal.html"
+    },
+    {
+      "id": "calculator",
+      "name": "Calculator",
+      "icon": "＋",
+      "description": "A simple calculator",
+      "file": "calculator.html"
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "icon": "▦",
+      "description": "A month at a glance",
+      "file": "calendar.html"
+    },
+    {
+      "id": "images",
+      "name": "Image Viewer",
+      "icon": "▧",
+      "description": "View an image URL",
+      "file": "images.html"
+    },
+    {
+      "id": "music",
+      "name": "Media Player",
+      "icon": "♫",
+      "description": "A simple audio player",
+      "file": "music.html"
+    },
+    {
+      "id": "reader",
+      "name": "Reader",
+      "icon": "¶",
+      "description": "Read your saved text",
+      "file": "reader.html"
+    },
+    {
+      "id": "tasks",
+      "name": "Task Manager",
+      "icon": "▥",
+      "description": "See open windows",
+      "file": "tasks.html"
+    },
+    {
+      "id": "store",
+      "name": "App Store",
+      "icon": "▦",
+      "description": "Discover and install more apps",
+      "file": "store.html"
+    },
+    {
+      "id": "scientific",
+      "name": "Scientific Calculator",
+      "icon": "∑",
+      "description": "Scientific functions and constants",
+      "file": "scientific.html"
+    },
+    {
+      "id": "mail",
+      "name": "Mail",
+      "icon": "✉",
+      "description": "Local email-style inbox and composer",
+      "file": "mail.html"
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "icon": "⚙",
+      "description": "Personalize your OS",
+      "file": "settings.html"
+    },
+    {
+      "id": "system",
+      "name": "System Info",
+      "icon": "ⓘ",
+      "description": "About this workspace",
+      "file": "system.html"
+    }
+  ]
+}
