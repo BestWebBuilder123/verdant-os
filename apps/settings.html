@@ -1,1 +1,1062 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:dark;--line:#314332;--text:#e1ece0;--muted:#9aab9b}*{box-sizing:border-box}body{margin:0;padding:2px;background:transparent;color:var(--text);font:14px/1.45 system-ui,sans-serif}h1{font-size:23px;font-weight:600;letter-spacing:-.04em;margin:0 0 5px}h2{font-size:16px;margin:16px 0 8px}p{color:var(--muted);font-size:12px}button,input,textarea,select{font:inherit}button{cursor:pointer;color:var(--text);background:#213624;border:1px solid #456348;border-radius:8px;padding:9px 12px}button:hover{background:#2b4530}input,textarea,select{width:100%;padding:10px;background:#0c130d;border:1px solid var(--line);border-radius:8px;color:var(--text)}textarea{min-height:170px;resize:vertical}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}.card,.item{background:#ffffff05;border:1px solid #ffffff12;border-radius:10px;padding:12px}.muted{color:var(--muted);font-size:11px}.list{display:grid;gap:7px}.big{font:28px ui-monospace,monospace;text-align:center;padding:20px}.btn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.btn-grid button{padding:13px 4px}.head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:15px}canvas{width:100%;height:250px;background:#0b110c;border:1px solid var(--line);border-radius:9px;touch-action:none}label{font-size:12px;color:var(--muted)}audio{width:100%}</style></head><body><h1>Settings</h1><p>Changes apply to Verdant OS.</p><div class="card"><h2>Theme</h2><label>Accent color<input id="accent" type="color" value="#8fbe93"></label><div class="row"><button data-theme="dark">Dark</button><button data-theme="light">Light</button></div></div><div class="card"><h2>Interface size</h2><label>Overall scale<input data-setting="uiScale" type="range" min="80" max="120" value="100"></label><label>Text size<input data-setting="fontSize" type="range" min="85" max="125" value="100"></label><label>Icon size<input data-setting="iconSize" type="range" min="80" max="140" value="100"></label><label>Top bar size<input data-setting="topbarSize" type="range" min="80" max="125" value="100"></label></div><div class="card"><h2>Appearance</h2><label>Glass opacity<input data-setting="glass" type="range" min="60" max="100" value="94"></label><label>Brightness<input data-setting="brightness" type="range" min="70" max="120" value="100"></label><label><input type="checkbox" data-setting="square" style="width:auto"> Square corners</label><label><input type="checkbox" data-setting="motion" checked style="width:auto"> Animations</label></div><button id="reset">Reset defaults</button><script>const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];function send(type,data={}){parent.postMessage({source:'verdant-app',type,...data},'*')}function save(key,value){send('storage:set',{key:'app:'+key,value})}function load(key,cb){const requestId=Math.random().toString(36).slice(2);function fn(e){if(e.data?.source==='verdant-os'&&e.data.type==='storage:value'&&e.data.requestId===requestId){removeEventListener('message',fn);cb(e.data.value)}}addEventListener('message',fn);send('storage:get',{key:'app:'+key,requestId})}function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</script><script>$('#accent').oninput=e=>send('setting-change',{key:'accent',value:e.target.value});$$('[data-theme]').forEach(b=>b.onclick=()=>send('setting-change',{key:'theme',value:b.dataset.theme}));$$('[data-setting]').forEach(el=>el.oninput=()=>send('setting-change',{key:el.dataset.setting,value:el.type==='checkbox'?el.checked:Number(el.value)}));$('#reset').onclick=()=>send('reset-settings');load('settings',v=>{if(!v)return;$$('[data-setting]').forEach(el=>{if(v[el.dataset.setting]!==undefined){if(el.type==='checkbox')el.checked=!!v[el.dataset.setting];else el.value=v[el.dataset.setting]}});if(v.accent)$('#accent').value=v.accent});</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101713">
+<title>Verdant Chat — Settings</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0c100e;
+  --panel: #141b17;
+  --panel2: #1a241e;
+  --text: #edf6ef;
+  --muted: #98aa9d;
+  --accent: #59d98e;
+  --line: #2b3930;
+  --radius: 18px;
+  --blur: 0px;
+  --overlay: .75;
+  --font-size: 15px;
+  --wallpaper: none;
+  --density: 1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: var(--font-size);
+  color: var(--text);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(5,10,7,var(--overlay)),
+                    rgba(5,10,7,var(--overlay))),
+    var(--wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  transition: background-color .25s, color .25s;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.app {
+  width: min(1100px, 100%);
+  margin: auto;
+  padding: 28px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--accent);
+  color: #07130b;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -1px;
+}
+
+h2 { margin: 0 0 5px; font-size: 19px; }
+h3 { margin: 0 0 7px; font-size: 14px; }
+p { margin: 0; }
+
+.muted { color: var(--muted); font-size: 13px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 225px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.sidebar,
+.content {
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+}
+
+.sidebar {
+  position: sticky;
+  top: 15px;
+  padding: 9px;
+}
+
+.nav-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  padding: 13px;
+  text-align: left;
+  margin-bottom: 3px;
+}
+
+.nav-button:hover,
+.nav-button.active {
+  background: var(--panel2);
+  color: var(--text);
+}
+
+.nav-button.active {
+  box-shadow: inset 3px 0 var(--accent);
+}
+
+.icon { width: 22px; text-align: center; }
+
+.content { padding: 25px; min-width: 0; }
+
+.section-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 23px;
+}
+
+.section-header p { color: var(--muted); font-size: 13px; }
+
+.section { margin-bottom: 27px; }
+
+.section-title {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--panel2) 80%, transparent);
+  margin-bottom: 11px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.row strong { display: block; font-size: 14px; }
+.row small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+button, select, input { max-width: 100%; }
+
+.btn {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel2);
+  color: var(--text);
+}
+
+.btn:hover { border-color: var(--accent); }
+
+.btn.primary {
+  color: #07130b;
+  background: var(--accent);
+  border-color: transparent;
+  font-weight: 750;
+}
+
+input[type="color"] {
+  width: 46px;
+  height: 40px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+input[type="text"],
+input[type="url"],
+select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+input[type="range"] { accent-color: var(--accent); }
+
+.switch {
+  appearance: none;
+  position: relative;
+  width: 46px;
+  height: 27px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 30px;
+  background: #39443c;
+  cursor: pointer;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  width: 21px;
+  height: 21px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: white;
+  transition: transform .2s;
+}
+
+.switch:checked { background: var(--accent); }
+.switch:checked::after { transform: translateX(19px); background: #07130b; }
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 15px;
+}
+
+.field label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.field input { margin-bottom: 2px; }
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 9px;
+}
+
+.theme {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--panel2);
+  text-align: left;
+}
+
+.theme.active { border-color: var(--accent); }
+
+.theme-color {
+  display: block;
+  height: 34px;
+  margin-bottom: 7px;
+  border-radius: 7px;
+}
+
+.theme-name { font-size: 11px; }
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel2);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #07130b;
+  font-weight: 900;
+}
+
+.bubble {
+  background: var(--bg);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px 14px 14px;
+  font-size: 13px;
+}
+
+.bubble strong { display: block; color: var(--accent); margin-bottom: 4px; }
+
+.wallpaper-preview {
+  height: 145px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background-position: center;
+  background-size: cover;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: 25px;
+  border-top: 1px solid var(--line);
+}
+
+.note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.hidden { display: none !important; }
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, 15px);
+  opacity: 0;
+  padding: 12px 17px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 12px;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 10;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.danger { border-color: #714047; }
+
+@media (max-width: 720px) {
+  .app { padding: 15px; }
+  header { align-items: flex-start; }
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; display: flex; overflow-x: auto; gap: 4px; }
+  .nav-button { width: auto; flex-shrink: 0; white-space: nowrap; padding: 10px; }
+  .nav-button.active { box-shadow: inset 0 -3px var(--accent); }
+  .content { padding: 17px; }
+  .themes { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .fields { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">V</div>
+    <div>
+      <h1>Settings</h1>
+      <p class="muted">Make Verdant Chat yours.</p>
+    </div>
+  </div>
+  <button class="btn primary" id="save">Save changes</button>
+</header>
+
+<div class="layout">
+
+<nav class="sidebar">
+  <button class="nav-button active" data-tab="appearance"><span class="icon">◐</span>Appearance</button>
+  <button class="nav-button" data-tab="background"><span class="icon">▧</span>Background</button>
+  <button class="nav-button" data-tab="interface"><span class="icon">☷</span>Interface</button>
+  <button class="nav-button" data-tab="profile"><span class="icon">◎</span>Profile</button>
+  <button class="nav-button" data-tab="privacy"><span class="icon">⇄</span>Data & privacy</button>
+</nav>
+
+<main class="content">
+
+<!-- APPEARANCE -->
+<section class="tab" id="tab-appearance">
+  <div class="section-header">
+    <h2>Appearance</h2>
+    <p>Personalize your theme, colors, and effects.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Theme presets</div>
+    <div class="themes">
+      <button class="theme active" data-theme="verdant">
+        <span class="theme-color" style="background:linear-gradient(135deg,#0c100e 50%,#59d98e 50%)"></span>
+        <span class="theme-name">Verdant</span>
+      </button>
+      <button class="theme" data-theme="midnight">
+        <span class="theme-color" style="background:linear-gradient(135deg,#0b1020 50%,#7ba7ff 50%)"></span>
+        <span class="theme-name">Midnight</span>
+      </button>
+      <button class="theme" data-theme="plum">
+        <span class="theme-color" style="background:linear-gradient(135deg,#130d18 50%,#d18cff 50%)"></span>
+        <span class="theme-name">Plum Dusk</span>
+      </button>
+      <button class="theme" data-theme="slate">
+        <span class="theme-color" style="background:linear-gradient(135deg,#101419 50%,#b2c1d1 50%)"></span>
+        <span class="theme-name">Slate</span>
+      </button>
+      <button class="theme" data-theme="custom">
+        <span class="theme-color" style="background:conic-gradient(#59d98e,#7ba7ff,#d18cff,#59d98e)"></span>
+        <span class="theme-name">Custom</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Custom colors</div>
+    <div class="card">
+      <div class="fields">
+        <div class="field"><label for="accent">Accent color</label><input type="color" id="accent"></div>
+        <div class="field"><label for="bg">Background color</label><input type="color" id="bg"></div>
+        <div class="field"><label for="panel">Panel color</label><input type="color" id="panel"></div>
+        <div class="field"><label for="text">Text color</label><input type="color" id="text"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Visual effects</div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Liquid Glass</strong><small>Frosted, translucent panels and blur.</small></div>
+        <input class="switch" type="checkbox" id="glass">
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Rounded corners</strong><small>Use softer cards and controls.</small></div>
+        <input class="switch" type="checkbox" id="rounded" checked>
+      </div>
+    </div>
+    <div class="preview">
+      <div class="avatar" id="previewAvatar">V</div>
+      <div class="bubble"><strong id="previewName">Live preview</strong>Your theme updates as you change settings.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACKGROUND -->
+<section class="tab hidden" id="tab-background">
+  <div class="section-header">
+    <h2>Background</h2>
+    <p>Use your own wallpaper instead of a plain background.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Wallpaper</div>
+    <div class="card">
+      <div class="field">
+        <label for="wallpaperUrl">Wallpaper image URL</label>
+        <input type="url" id="wallpaperUrl" placeholder="https://example.com/image.jpg">
+      </div>
+      <div class="row" style="margin-top:15px">
+        <div><strong>Upload wallpaper</strong><small>Choose an image from your device.</small></div>
+        <label class="btn">Choose image<input type="file" id="wallpaperFile" accept="image/*" hidden></label>
+      </div>
+      <div class="wallpaper-preview" id="wallpaperPreview">Wallpaper preview</div>
+      <div class="row" style="margin-top:18px">
+        <div><strong>Dark overlay</strong><small>Adjust text readability.</small></div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <input type="range" id="overlay" min="10" max="95" value="75">
+          <span id="overlayLabel">75%</span>
+        </div>
+      </div>
+      <div class="footer">
+        <button class="btn" id="removeWallpaper">Remove wallpaper</button>
+        <button class="btn primary" id="applyUrl">Apply URL</button>
+      </div>
+    </div>
+    <p class="note">Uploaded wallpapers are stored in this browser. Very large images may exceed browser storage limits.</p>
+  </div>
+</section>
+
+<!-- INTERFACE -->
+<section class="tab hidden" id="tab-interface">
+  <div class="section-header">
+    <h2>Interface</h2>
+    <p>Control readability, spacing, and motion.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Layout</div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Interface density</strong><small>Change spacing between interface elements.</small></div>
+        <select id="density" style="width:145px">
+          <option value="comfortable">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Text size</strong><small>Adjust the base font size.</small></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" id="fontSize" min="13" max="20" value="15">
+          <span id="fontLabel">15px</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Animations</strong><small>Enable or reduce interface transitions.</small></div>
+        <input class="switch" type="checkbox" id="animations" checked>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Show timestamps</strong><small>Preference for compatible chat interfaces.</small></div>
+        <input class="switch" type="checkbox" id="timestamps" checked>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Compact sidebar</strong><small>Save space on wider screens.</small></div>
+        <input class="switch" type="checkbox" id="compactSidebar">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section class="tab hidden" id="tab-profile">
+  <div class="section-header">
+    <h2>Profile</h2>
+    <p>Set your display details for compatible Verdant Chat builds.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Your details</div>
+    <div class="card">
+      <div class="field">
+        <label for="displayName">Display name</label>
+        <input type="text" id="displayName" maxlength="32" placeholder="Your name">
+      </div>
+      <div class="field" style="margin-top:15px">
+        <label for="status">Status message</label>
+        <input type="text" id="status" maxlength="80" placeholder="What are you up to?">
+      </div>
+      <div class="field" style="margin-top:15px">
+        <label for="avatar">Avatar text or emoji</label>
+        <input type="text" id="avatar" maxlength="5" placeholder="V">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section class="tab hidden" id="tab-privacy">
+  <div class="section-header">
+    <h2>Data & privacy</h2>
+    <p>Back up, restore, or reset your preferences.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Backup</div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Export settings</strong><small>Download your preferences as a JSON file.</small></div>
+        <button class="btn" id="export">Export</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><strong>Import settings</strong><small>Restore a previously exported JSON file.</small></div>
+        <label class="btn">Import<input type="file" id="import" accept=".json,application/json" hidden></label>
+      </div>
+    </div>
+    <div class="card danger">
+      <div class="row">
+        <div><strong>Reset all settings</strong><small>Restore the default Verdant appearance.</small></div>
+        <button class="btn" id="reset">Reset</button>
+      </div>
+    </div>
+    <p class="note">Settings are saved locally on this device. They do not automatically synchronize with other users or devices.</p>
+  </div>
+</section>
+
+<div class="footer">
+  <span class="note">Your changes are saved in this browser.</span>
+  <button class="btn primary" id="saveBottom">Save changes</button>
+</div>
+
+</main>
+</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Settings saved</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const KEY = "verdant-chat-settings-v1";
+
+  const defaults = {
+    theme: "verdant",
+    accent: "#59d98e",
+    bg: "#0c100e",
+    panel: "#141b17",
+    text: "#edf6ef",
+    glass: false,
+    rounded: true,
+    wallpaperUrl: "",
+    wallpaperData: "",
+    overlay: 75,
+    density: "comfortable",
+    fontSize: 15,
+    animations: true,
+    timestamps: true,
+    compactSidebar: false,
+    displayName: "",
+    status: "",
+    avatar: "V"
+  };
+
+  const presets = {
+    verdant: {
+      accent:"#59d98e", bg:"#0c100e",
+      panel:"#141b17", text:"#edf6ef"
+    },
+    midnight: {
+      accent:"#7ba7ff", bg:"#0b1020",
+      panel:"#151d31", text:"#eef2ff"
+    },
+    plum: {
+      accent:"#d18cff", bg:"#130d18",
+      panel:"#211629", text:"#f7efff"
+    },
+    slate: {
+      accent:"#b2c1d1", bg:"#101419",
+      panel:"#1a222b", text:"#f0f4f8"
+    }
+  };
+
+  const $ = id => document.getElementById(id);
+  let s = {...defaults};
+
+  function hexRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return `${n >> 16},${(n >> 8) & 255},${n & 255}`;
+  }
+
+  function mix(a, b, amount) {
+    const A = [1,3,5].map(i => parseInt(a.slice(i,i+2),16));
+    const B = [1,3,5].map(i => parseInt(b.slice(i,i+2),16));
+    return "#" + A.map((v,i) =>
+      Math.round(v*(1-amount)+B[i]*amount)
+        .toString(16).padStart(2,"0")
+    ).join("");
+  }
+
+  function safeColor(value, fallback) {
+    return /^#[0-9a-f]{6}$/i.test(value || "") ? value : fallback;
+  }
+
+  function toast(message) {
+    const el = $("toast");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => el.classList.remove("show"), 2200);
+  }
+
+  function readForm() {
+    s.accent = $("accent").value;
+    s.bg = $("bg").value;
+    s.panel = $("panel").value;
+    s.text = $("text").value;
+    s.glass = $("glass").checked;
+    s.rounded = $("rounded").checked;
+    s.wallpaperUrl = $("wallpaperUrl").value.trim();
+    s.overlay = Number($("overlay").value);
+    s.density = $("density").value;
+    s.fontSize = Number($("fontSize").value);
+    s.animations = $("animations").checked;
+    s.timestamps = $("timestamps").checked;
+    s.compactSidebar = $("compactSidebar").checked;
+    s.displayName = $("displayName").value.trim();
+    s.status = $("status").value.trim();
+    s.avatar = $("avatar").value.trim() || "V";
+  }
+
+  function apply() {
+    s.accent = safeColor(s.accent, defaults.accent);
+    s.bg = safeColor(s.bg, defaults.bg);
+    s.panel = safeColor(s.panel, defaults.panel);
+    s.text = safeColor(s.text, defaults.text);
+
+    const root = document.documentElement.style;
+
+    root.setProperty("--accent", s.accent);
+    root.setProperty("--bg", s.bg);
+    root.setProperty("--panel", s.panel);
+    root.setProperty("--panel2", mix(s.panel, s.bg, .4));
+    root.setProperty("--text", s.text);
+    root.setProperty("--muted", mix(s.text, s.bg, .55));
+    root.setProperty("--line", mix(s.panel, s.text, .2));
+    root.setProperty("--radius", s.rounded ? "18px" : "7px");
+    root.setProperty("--blur", s.glass ? "18px" : "0px");
+    root.setProperty("--overlay", String(s.overlay / 100));
+    root.setProperty("--font-size", s.fontSize + "px");
+    root.setProperty("--density", s.density === "compact" ? ".8" : "1");
+
+    document.body.style.transition = s.animations ? "background-color .25s,color .25s" : "none";
+
+    const wallpaper = s.wallpaperData || s.wallpaperUrl;
+    root.setProperty(
+      "--wallpaper",
+      wallpaper ? `url("${wallpaper.replace(/["\\\n\r]/g, "")}")` : "none"
+    );
+
+    const preview = $("wallpaperPreview");
+    preview.style.backgroundImage = wallpaper
+      ? `linear-gradient(rgba(5,10,7,.12),rgba(5,10,7,.12)),url("${wallpaper.replace(/["\\\n\r]/g, "")}")`
+      : "none";
+    preview.textContent = wallpaper ? "" : "Wallpaper preview";
+
+    $("fontLabel").textContent = s.fontSize + "px";
+    $("overlayLabel").textContent = s.overlay + "%";
+    $("previewAvatar").textContent = s.avatar || "V";
+    $("previewName").textContent = s.displayName || "Live preview";
+
+    document.querySelectorAll(".theme").forEach(button => {
+      button.classList.toggle("active", button.dataset.theme === s.theme);
+    });
+  }
+
+  function fillForm() {
+    ["accent","bg","panel","text"].forEach(id => {
+      $(id).value = safeColor(s[id], defaults[id]);
+    });
+
+    $("glass").checked = !!s.glass;
+    $("rounded").checked = !!s.rounded;
+    $("wallpaperUrl").value = s.wallpaperUrl || "";
+    $("overlay").value = s.overlay;
+    $("density").value = s.density;
+    $("fontSize").value = s.fontSize;
+    $("animations").checked = !!s.animations;
+    $("timestamps").checked = !!s.timestamps;
+    $("compactSidebar").checked = !!s.compactSidebar;
+    $("displayName").value = s.displayName || "";
+    $("status").value = s.status || "";
+    $("avatar").value = s.avatar || "V";
+  }
+
+  function broadcast() {
+    const message = {
+      type: "VERDANT_CHAT_SETTINGS_UPDATED",
+      settings: {...s}
+    };
+
+    try {
+      if (window.parent !== window) {
+        window.parent.postMessage(message, "*");
+      }
+      if (window.opener) {
+        window.opener.postMessage(message, "*");
+      }
+    } catch (error) {}
+  }
+
+  function save(showToast = true) {
+    readForm();
+    apply();
+
+    try {
+      localStorage.setItem(KEY, JSON.stringify(s));
+    } catch (error) {
+      toast("Storage full. Try a smaller wallpaper.");
+      return;
+    }
+
+    broadcast();
+
+    if (showToast) toast("Settings saved!");
+  }
+
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+      s = {...defaults, ...saved};
+    } catch (error) {
+      s = {...defaults};
+    }
+
+    s.accent = safeColor(s.accent, defaults.accent);
+    s.bg = safeColor(s.bg, defaults.bg);
+    s.panel = safeColor(s.panel, defaults.panel);
+    s.text = safeColor(s.text, defaults.text);
+
+    fillForm();
+    apply();
+  }
+
+  function setTheme(name) {
+    s.theme = name;
+
+    if (presets[name]) {
+      Object.assign(s, presets[name]);
+      fillForm();
+    }
+
+    apply();
+    save(false);
+  }
+
+  // Navigation
+  document.querySelectorAll(".nav-button").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".nav-button").forEach(b =>
+        b.classList.toggle("active", b === button)
+      );
+
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.toggle("hidden", tab.id !== "tab-" + button.dataset.tab);
+      });
+    });
+  });
+
+  // Theme presets
+  document.querySelectorAll(".theme").forEach(button => {
+    button.addEventListener("click", () => {
+      setTheme(button.dataset.theme);
+    });
+  });
+
+  // Live appearance changes
+  const watched = [
+    "accent","bg","panel","text","glass","rounded",
+    "density","animations","timestamps","compactSidebar",
+    "displayName","status","avatar"
+  ];
+
+  watched.forEach(id => {
+    $(id).addEventListener("input", () => {
+      s.theme = "custom";
+      readForm();
+      apply();
+    });
+
+    $(id).addEventListener("change", () => {
+      readForm();
+      apply();
+    });
+  });
+
+  $("fontSize").addEventListener("input", () => {
+    readForm();
+    apply();
+  });
+
+  $("overlay").addEventListener("input", () => {
+    readForm();
+    apply();
+  });
+
+  // Wallpaper URL
+  $("wallpaperUrl").addEventListener("input", () => {
+    s.wallpaperUrl = $("wallpaperUrl").value.trim();
+    s.wallpaperData = "";
+    apply();
+  });
+
+  $("applyUrl").addEventListener("click", () => {
+    s.wallpaperUrl = $("wallpaperUrl").value.trim();
+    s.wallpaperData = "";
+    save();
+  });
+
+  $("removeWallpaper").addEventListener("click", () => {
+    s.wallpaperUrl = "";
+    s.wallpaperData = "";
+    $("wallpaperUrl").value = "";
+    apply();
+    save();
+  });
+
+  // Uploaded wallpaper: resize it before storing to reduce storage usage.
+  $("wallpaperFile").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast("Choose an image file.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 12 * 1024 * 1024) {
+      toast("Please choose an image under 12 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const image = new Image();
+      image.src = dataUrl;
+
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+      });
+
+      const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      s.wallpaperData = canvas.toDataURL("image/jpeg", .82);
+      s.wallpaperUrl = "";
+      $("wallpaperUrl").value = "";
+
+      apply();
+      save();
+    } catch (error) {
+      toast("Could not load that image.");
+    }
+
+    event.target.value = "";
+  });
+
+  // Save buttons
+  $("save").addEventListener("click", () => save());
+  $("saveBottom").addEventListener("click", () => save());
+
+  // Reset
+  function resetSettings() {
+    s = {...defaults};
+    fillForm();
+    apply();
+
+    try {
+      localStorage.setItem(KEY, JSON.stringify(s));
+    } catch (error) {}
+
+    broadcast();
+    toast("Settings reset.");
+  }
+
+  $("reset").addEventListener("click", resetSettings);
+
+  // Export
+  $("export").addEventListener("click", () => {
+    readForm();
+
+    const blob = new Blob(
+      [JSON.stringify(s, null, 2)],
+      {type:"application/json"}
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "verdant-chat-settings.json";
+    link.click();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Settings exported.");
+  });
+
+  // Import
+  $("import").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const imported = JSON.parse(await file.text());
+
+      if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
+        throw new Error("Invalid settings");
+      }
+
+      s = {...defaults, ...imported};
+      s.accent = safeColor(s.accent, defaults.accent);
+      s.bg = safeColor(s.bg, defaults.bg);
+      s.panel = safeColor(s.panel, defaults.panel);
+      s.text = safeColor(s.text, defaults.text);
+
+      fillForm();
+      save();
+      toast("Settings imported.");
+    } catch (error) {
+      toast("Invalid settings JSON file.");
+    }
+
+    event.target.value = "";
+  });
+
+  // Support requests from a parent app.
+  window.addEventListener("message", event => {
+    if (event.data?.type === "VERDANT_CHAT_GET_SETTINGS") {
+      try {
+        event.source?.postMessage({
+          type: "VERDANT_CHAT_SETTINGS",
+          settings: {...s}
+        }, event.origin === "null" ? "*" : event.origin);
+      } catch (error) {}
+    }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
