@@ -20,9 +20,7 @@
   --font-size: 14px;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -34,26 +32,13 @@ html, body {
   color: var(--text);
 }
 
-button, input, textarea, select {
-  font: inherit;
-}
-
-button {
-  color: inherit;
-  cursor: pointer;
-}
-
+button, input, textarea, select { font: inherit; }
+button { color: inherit; cursor: pointer; }
 button:focus-visible, input:focus-visible {
   outline: 2px solid var(--accent);
 }
-
-button:active {
-  transform: scale(.98);
-}
-
-.hidden {
-  display: none !important;
-}
+button:active { transform: scale(.98); }
+.hidden { display: none !important; }
 
 #desktop {
   position: fixed;
@@ -89,9 +74,7 @@ button:active {
   pointer-events: none;
 }
 
-#desktop-content > * {
-  pointer-events: auto;
-}
+#desktop-content > * { pointer-events: auto; }
 
 .topbar {
   position: absolute;
@@ -115,10 +98,7 @@ button:active {
   font-weight: 750;
   letter-spacing: .12em;
 }
-
-.brand span {
-  color: var(--accent);
-}
+.brand span { color: var(--accent); }
 
 .top-right {
   display: flex;
@@ -316,9 +296,7 @@ button:active {
   transform: none !important;
 }
 
-.window.minimized {
-  display: none;
-}
+.window.minimized { display: none; }
 
 .titlebar {
   flex: 0 0 44px;
@@ -333,9 +311,7 @@ button:active {
   touch-action: none;
 }
 
-.titlebar:active {
-  cursor: grabbing;
-}
+.titlebar:active { cursor: grabbing; }
 
 .window-title {
   display: flex;
@@ -358,13 +334,8 @@ button:active {
   background: transparent;
 }
 
-.window-controls button:hover {
-  background: var(--bg);
-}
-
-.window-controls .close:hover {
-  background: #8d403d;
-}
+.window-controls button:hover { background: var(--bg); }
+.window-controls .close:hover { background: #8d403d; }
 
 .window-body {
   flex: 1;
@@ -373,9 +344,7 @@ button:active {
   padding: 18px;
 }
 
-h1, h2, h3, p {
-  margin-top: 0;
-}
+h1, h2, h3, p { margin-top: 0; }
 
 h2 {
   font-size: 23px;
@@ -437,9 +406,7 @@ input[type="range"] {
   border-bottom: 1px solid var(--border);
 }
 
-.setting-row:last-child {
-  border-bottom: 0;
-}
+.setting-row:last-child { border-bottom: 0; }
 
 .setting-row strong {
   display: block;
@@ -467,9 +434,7 @@ input[type="range"] {
   background: var(--panel2);
 }
 
-.theme-option.selected {
-  border-color: var(--accent);
-}
+.theme-option.selected { border-color: var(--accent); }
 
 .theme-preview {
   display: flex;
@@ -501,9 +466,7 @@ input[type="range"] {
   transition: transform .15s;
 }
 
-.toggle.on {
-  background: var(--accent);
-}
+.toggle.on { background: var(--accent); }
 
 .toggle.on span {
   background: var(--bg);
@@ -549,9 +512,7 @@ body.square-windows button {
     padding: 0 9px;
   }
 
-  .top-right {
-    gap: 3px;
-  }
+  .top-right { gap: 3px; }
 
   .shortcuts {
     top: 58px;
@@ -598,13 +559,8 @@ body.square-windows button {
     height: calc(100dvh - 92px) !important;
   }
 
-  .window-body {
-    padding: 13px;
-  }
-
-  h2 {
-    font-size: 21px;
-  }
+  .window-body { padding: 13px; }
+  h2 { font-size: 21px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -612,6 +568,23 @@ body.square-windows button {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Compact mode */
+body.compact .window-titlebar,
+body.compact .titlebar {
+  min-height: 34px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+body.compact .window-body { padding: 12px; }
+body.compact .app-tile {
+  gap: 5px;
+  padding: 10px;
+}
+body.compact .task-button {
+  width: 36px;
+  height: 36px;
 }
 </style>
 </head>
@@ -631,7 +604,6 @@ body.square-windows button {
     </header>
 
     <div class="shortcuts" id="shortcuts"></div>
-
     <div id="windows"></div>
 
     <div id="start-menu" class="hidden">
@@ -750,12 +722,10 @@ body.square-windows button {
       win.style.borderRadius = settings.square ? "3px" : "var(--radius)";
     });
 
-    // Notify installed apps that the global theme changed.
     window.dispatchEvent(new CustomEvent("verdant-theme-change", {
       detail: {...settings}
     }));
 
-    // Send the settings to compatible app iframes.
     $$("iframe[data-verdant-app]").forEach(frame => {
       try {
         frame.contentWindow.postMessage({
@@ -1129,12 +1099,16 @@ body.square-windows button {
         return;
       }
 
+      // FIX: update the current Settings window in place.
+      // Do not create a second Settings window.
       if (b.dataset.theme) {
         const key = b.dataset.theme;
         settings.theme = key;
         Object.assign(settings, THEMES[key]);
         saveSettings();
-        openApp("settings", {forceNew:true});
+
+        const body = win.querySelector(".window-body");
+        if (body) body.innerHTML = settingsApp();
         return;
       }
 
@@ -1142,7 +1116,9 @@ body.square-windows button {
         const key = b.dataset.toggle;
         settings[key] = !settings[key];
         saveSettings();
-        openApp("settings", {forceNew:true});
+
+        const body = win.querySelector(".window-body");
+        if (body) body.innerHTML = settingsApp();
         return;
       }
 
@@ -1243,13 +1219,18 @@ body.square-windows button {
     if (action === "reset") {
       settings = {...DEFAULTS};
       saveSettings();
-      openApp("settings", {forceNew:true});
+
+      // FIX: reset the existing window rather than opening another one.
+      const body = win.querySelector(".window-body");
+      if (body) body.innerHTML = settingsApp();
+
       toast("Appearance reset.");
     }
 
     if (action === "clear-notes") {
       localStorage.removeItem("verdant-notes");
-      openApp("notes", {forceNew:true});
+      closeApp("notes");
+      openApp("notes");
     }
 
     if (action === "calculate") {
@@ -1312,8 +1293,6 @@ body.square-windows button {
 
     if (e.target.closest("[data-start]")) {
       $("#start-menu").classList.toggle("hidden");
-    } else if (!e.target.closest("#start-menu")) {
-      // Clicking elsewhere does not force-close the launcher.
     }
   });
 
